@@ -1,0 +1,30 @@
+# Environments
+venv/
+.venv/
+env/
+.env
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Models and large files
+*.pth
+*.pt
+*.onnx
+*.bin
+*.h5
+
+# Local datasets and output files
+emotion_music/data/
+emotion_music/outputs/
+emotion_music/logs/
+*.db
+*.log
+
+# System/IDE files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
