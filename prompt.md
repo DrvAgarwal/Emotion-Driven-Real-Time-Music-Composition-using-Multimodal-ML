@@ -1,98 +1,102 @@
 # Prompt: Emotion-Driven Real-Time Music Composition using Multimodal ML
 
 ## Context and Role
-As a Machine Learning Engineer specializing in generative AI and affective computing, you are responsible for designing and implementing an end-to-end system that composes original music in real time based on a user's detected emotional state. The system must fuse inputs from facial expression analysis, voice tone recognition, and optional biometric signals (such as heart rate via webcam-based rPPG) to infer emotion and generate contextually appropriate music using a transformer-based generative model.
+You're a machine learning engineer who knows generative AI and affective computing — that's the field where computers try to understand human emotions. Your job is to build something pretty wild: a system that watches a person's face, listens to their voice, and then composes music on the spot that matches how they're feeling. Like a musical chameleon.
 
-This project is entirely novel — no existing open-source or commercial system combines real-time multimodal emotion fusion with live symbolic music generation and adaptive playback in a unified pipeline. The system must operate with low latency, remain explainable to the user, and be deployable as a local desktop or web application.
+The system needs to take in video from a webcam, audio from a mic, and optionally even estimate heart rate from the webcam feed (there's a clever trick called rPPG that does that). Then it blends all that information together, figures out the emotion, and generates original music using a transformer model. And here's the thing — nobody's really built an end‑to‑end system like this before. So you're basically making something new.
+
+It has to be fast, it has to be able to explain itself to the user ("why did you play happy music?"), and it should work as a local desktop app or a web app.
 
 ## Objective
-Develop a complete ML-powered system that:
-1. Detects user emotion in real time using facial, vocal, and biometric signals.
-2. Fuses multimodal inputs into a unified emotion embedding.
-3. Generates original MIDI music conditioned on the detected emotion using a transformer model.
-4. Synthesizes audio from MIDI and plays it back with smooth emotional transitions.
-5. Provides a user-facing dashboard showing detected emotion, confidence scores, and music controls.
-6. Logs emotion-music sessions for future personalization and model fine-tuning.
+Build a complete ML system that:
+* Detects emotion in real time from face, voice, and optional biometric signals
+* Merges those inputs into a single emotion "embedding" (just a fancy vector of numbers that represents the feeling)
+* Generates original MIDI music based on that emotion using a transformer
+* Turns that MIDI into actual sound and plays it back, with smooth transitions when the emotion changes
+* Shows the user a live dashboard with the detected emotion, confidence scores, and music controls
+* Logs everything so you can later personalize the model or fine‑tune it
 
 ## ML Model Requirements
 
 ### Emotion Detection Module
-* **Facial Expression Recognition**: Use a fine-tuned CNN (e.g., EfficientNet-B0 or MobileNetV3) trained on AffectNet or FER-2013.
-* **Voice Tone Analysis**: Use a pre-trained speech emotion model (e.g., wav2vec 2.0 fine-tuned on RAVDESS or IEMOCAP).
-* **Biometric Signal (Optional)**: Estimate heart rate from webcam using remote photoplethysmography (rPPG) as a stress indicator.
-* **Output**: Probability distribution over 8 emotion classes — Neutral, Happy, Sad, Angry, Fearful, Disgusted, Surprised, Calm.
+* **Face**: Use a fine‑tuned CNN like EfficientNet‑B0 or MobileNetV3, trained on AffectNet or FER-2013.
+* **Voice**: Use something like wav2vec 2.0 fine‑tuned on RAVDESS or IEMOCAP.
+* **Biometric (optional)**: Estimate heart rate from the webcam using rPPG — think of it as a stress indicator.
+* **Output**: Probabilities for 8 emotions: Neutral, Happy, Sad, Angry, Fearful, Disgusted, Surprised, Calm.
 
 ### Multimodal Fusion Layer
-* Implement a cross-attention fusion transformer that takes embeddings from each modality.
-* Weighted late fusion fallback if a modality is unavailable (e.g., no microphone).
-* **Output**: A single 128-dimensional emotion embedding vector.
+* Build a cross‑attention fusion transformer that takes the embeddings from each modality (face, voice, biometrics).
+* If a modality is missing (say, no microphone), fall back to weighted late fusion — still works, just less accurate.
+* Output a single 128‑dimensional emotion embedding.
 
 ### Music Generation Module
-* Use a fine-tuned Music Transformer (Huang et al.) or MuseNet-style GPT conditioned on emotion embeddings.
-* **Input**: Emotion embedding + user-selected genre/instrument preferences.
-* **Output**: MIDI token sequence representing original musical composition.
-* Ensure music transitions smoothly when emotion changes (interpolate embeddings over time).
+* Use a fine‑tuned Music Transformer (Huang et al.) or a MuseNet‑style GPT, conditioned on the emotion embedding.
+* **Inputs**: emotion embedding + what the user wants (genre, instrument).
+* **Output**: a sequence of MIDI tokens that represent original music.
+* **Smooth transitions**: when the emotion changes, interpolate the embeddings over time so the music doesn't jump around awkwardly.
 
 ## Data Requirements
-* **Facial**: AffectNet (1M images, 8 classes) or FER-2013 (35k images).
-* **Voice**: RAVDESS (24 actors), IEMOCAP (12 hours conversational data).
-* **Music**: Maestro dataset (200 hours of piano MIDI) + Lakh MIDI Dataset for multi-instrument.
-* **Emotion-Music Pairing**: Create a custom mapping dataset (minimum 500 curated MIDI samples labeled by emotion).
-* **Augmentation**: Apply pitch shift, time stretch, noise injection for audio; brightness/contrast jitter for facial data.
+* **Face**: AffectNet (1 million images) or FER‑2013 (35k images).
+* **Voice**: RAVDESS (24 actors), IEMOCAP (12 hours of conversation).
+* **Music**: Maestro (200 hours of piano MIDI) + Lakh MIDI Dataset (multi‑instrument).
+* **Emotion‑Music pairing**: Create your own custom dataset — at least 500 MIDI samples labeled by emotion.
+* **Augmentation**: For audio, use pitch shift, time stretch, noise injection. For face, brightness/contrast jitter.
 
 ## System Architecture Requirements
 
-### Pipeline Flow
-1. Webcam + Microphone Input
-2. Facial Frame Extractor (OpenCV) → CNN Emotion Model
-3. Audio Chunk Extractor → wav2vec 2.0 → Emotion Logits
-4. Optional rPPG Module → Stress/Arousal Signal
-5. Multimodal Fusion Transformer → Unified Emotion Embedding
-6. Music Transformer → MIDI Token Sequence
-7. FluidSynth / Pretty_MIDI → Audio Waveform → Real-time Playback
-8. Frontend Dashboard → Emotion Visualization + Music Controls
+### Pipeline Flow (step‑by‑step)
+1. Webcam + microphone start capturing
+2. Face frames go through OpenCV, then a CNN emotion model
+3. Audio chunks go through wav2vec 2.0, get emotion logits
+4. Optional rPPG module gives stress/arousal signal
+5. Multimodal fusion transformer produces one unified emotion embedding
+6. Music transformer turns that into MIDI tokens
+7. FluidSynth / pretty_midi converts to audio, plays in real time
+8. Frontend dashboard shows emotion visualization + music controls
 
-### Inference Latency Target
-* Emotion detection: under 200ms per frame.
-* Music generation: under 2 seconds for first 8-bar phrase.
-* End-to-end latency (input to audio): under 3 seconds.
+### Latency Targets (non‑negotiable)
+* **Emotion detection**: under 200ms per frame
+* **Music generation (first 8 bars)**: under 2 seconds
+* **End‑to‑end from input to audio**: under 3 seconds
 
 ## UI and Dashboard Requirements
-* Real-time emotion wheel visualization (valence-arousal 2D space).
-* Live confidence bar per emotion class.
-* Music playback controls: play, pause, regenerate, change instrument.
-* Session timeline showing emotion shifts over time.
-* Genre selector: Classical, Ambient, Jazz, Lo-Fi, Cinematic.
-* Built with Gradio, Streamlit, or React + FastAPI backend.
+The dashboard needs to show:
+* A real‑time emotion wheel (valence‑arousal 2D space)
+* Live confidence bars for each of the 8 emotions
+* Music playback controls: play, pause, regenerate, change instrument
+* A session timeline showing how emotion shifts over time
+* Genre selector: Classical, Ambient, Jazz, Lo-Fi, Cinematic
+
+You can build this with Gradio, Streamlit, or React + FastAPI.
 
 ## Backend Requirements
-* REST API (FastAPI) with endpoints: `/detect-emotion`, `/generate-music`, `/session-log`.
-* WebSocket support for real-time streaming emotion updates to frontend.
-* Session logging: store emotion timeline + generated MIDI to SQLite or PostgreSQL.
-* Model serving: TorchServe or ONNX Runtime for optimized inference.
-* GPU acceleration support via CUDA; CPU fallback mode for laptops.
-* Rate limiting and input validation on all API endpoints.
+* REST API with FastAPI — endpoints: `/detect‑emotion`, `/generate‑music`, `/session‑log`
+* WebSocket support for streaming real‑time emotion updates to the frontend
+* Session logging to SQLite or PostgreSQL (store emotion timeline + generated MIDI)
+* Model serving via TorchServe or ONNX Runtime for optimized inference
+* GPU acceleration (CUDA) and CPU fallback for laptops
+* Rate limiting and input validation on all API endpoints
 
 ## Model Training Requirements
-* Train emotion models with class-weighted cross-entropy (handles imbalanced datasets).
-* Fine-tune Music Transformer with emotion-conditioned prefix tokens.
-* Use mixed precision training (FP16) for efficiency.
-* Implement early stopping, learning rate scheduling (cosine annealing).
-* Log all experiments with MLflow or Weights & Biases.
-* Evaluate with: accuracy, F1-score (emotion); BLEU-MIDI, musical coherence score (music).
+* Train emotion models with class‑weighted cross‑entropy (because datasets are often imbalanced)
+* Fine‑tune Music Transformer with emotion‑conditioned prefix tokens
+* Use mixed precision training (FP16) to save memory and speed things up
+* Early stopping and cosine annealing learning rate scheduler
+* Log every experiment with MLflow or Weights & Biases
+* **Evaluate with**: accuracy, F1‑score (for emotion); BLEU‑MIDI and a musical coherence score (for music)
 
 ## Output Requirements
-* Real-time emotion detection running from webcam and microphone.
-* Original MIDI + synthesized audio generated per detected emotion.
-* Downloadable session report: emotion timeline + MIDI file.
-* Explainability panel showing which modality influenced the emotion most.
-* Graceful degradation if a modality is unavailable.
+* Real‑time emotion detection running from webcam + mic
+* Original MIDI + synthesized audio generated per detected emotion
+* Downloadable session report: emotion timeline + MIDI file
+* **Explainability panel** showing which modality (face, voice, or rPPG) influenced the emotion the most
+* **Graceful degradation** — if a modality is missing, the system still works fine
 
 ## Error Handling and Documentation
-* Handle missing webcam or microphone with fallback to single-modality mode.
-* Catch MIDI generation failures and retry with a simpler emotion fallback.
-* Log all inference errors with timestamps and input metadata.
-* **Document**:
+* If webcam or microphone is missing, fall back to single‑modality mode and tell the user
+* If MIDI generation fails, catch it and retry with a simpler emotion fallback
+* Log all inference errors with timestamps and input metadata
+* **Documentation must include**:
   * Folder structure and module descriptions
   * Model download and setup instructions
   * Environment variable configuration
@@ -100,11 +104,11 @@ Develop a complete ML-powered system that:
   * Deployment guide (local and Docker)
 
 ## Performance and Scalability
-* Quantize emotion models to INT8 for CPU efficiency.
-* Cache recent emotion embeddings to avoid redundant inference.
-* Support multi-user sessions via async FastAPI workers.
-* Music generation batching for concurrent users.
-* Docker containerization for reproducible deployment.
+* Quantize emotion models to INT8 for CPU efficiency
+* Cache recent emotion embeddings to avoid redundant inference
+* Support multi‑user sessions via async FastAPI workers
+* Batch music generation for concurrent users
+* Docker containerization for reproducible deployment
 
 ## Technology Stack
 
@@ -127,6 +131,6 @@ Develop a complete ML-powered system that:
 * Docker + Docker Compose (deployment)
 * GitHub Actions (CI/CD pipeline)
 
-### Optional
-* Redis (real-time cache for emotion embeddings)
-* Celery (async music generation tasks)
+### Optional but helpful
+* Redis for real‑time cache of emotion embeddings
+* Celery for async music generation tasks
