@@ -270,7 +270,7 @@ class FaceEmotionDetector:
         self.emotions   = config.EMOTION_CLASSES
 
     def _load_model(self) -> FaceEmotionModel:
-        model = FaceEmotionModel(num_classes=config.NUM_EMOTIONS, pretrained=True)
+        model = FaceEmotionModel(num_classes=config.NUM_EMOTIONS, pretrained=False)
         if config.FACE_MODEL_PATH and os.path.exists(config.FACE_MODEL_PATH):
             try:
                 state = torch.load(config.FACE_MODEL_PATH, map_location=self.device)
