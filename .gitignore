@@ -17,9 +17,12 @@ __pycache__/
 *.h5
 
 # Local datasets and output files
-emotion_music/data/
-emotion_music/outputs/
-emotion_music/logs/
+golden_response/emotion_music/data/
+golden_response/emotion_music/outputs/
+golden_response/emotion_music/logs/
+golden_response/data/
+golden_response/outputs/
+golden_response/logs/
 *.db
 *.log
 

@@ -10,18 +10,19 @@ This repository represents the complete, high-fidelity submission for the Post-T
 .
 ├── prompt.md                 # The conversational domain-specific ML coding prompt
 ├── justification.md          # Structured evaluation report containing the Final Verdict
-├── golden_response.py        # The self-contained Golden Response reference implementation
 ├── README.md                 # This root assessment overview
-└── emotion_music/            # Fully modularized project packages
-    ├── models/               # PyTorch models (Face CNN, Speech Wav2Vec2)
-    ├── fusion/               # Cross-attention fusion transformer
-    ├── music/                # GPT Music Transformer and sound synthesis player
-    ├── backend/              # FastAPI + WebSocket backend
-    ├── frontend/             # Streamlit dashboard
-    ├── scripts/              # ML training pipelines (MLflow tracking)
-    ├── Dockerfile            # Container deployment configurations
-    ├── requirements.txt      # Python dependencies
-    └── main.py               # Main modular application runner
+└── golden_response/          # Golden Response submission folder
+    ├── golden_response.py    # The self-contained Golden Response reference implementation
+    └── emotion_music/        # Fully modularized project packages
+        ├── models/           # PyTorch models (Face CNN, Speech Wav2Vec2)
+        ├── fusion/           # Cross-attention fusion transformer
+        ├── music/            # GPT Music Transformer and sound synthesis player
+        ├── backend/          # FastAPI + WebSocket backend
+        ├── frontend/         # Streamlit dashboard
+        ├── scripts/          # ML training pipelines (MLflow tracking)
+        ├── Dockerfile        # Container deployment configurations
+        ├── requirements.txt  # Python dependencies
+        └── main.py           # Main modular application runner
 ```
 
 ---
@@ -37,11 +38,13 @@ The `justification.md` file contains the **Final Verdict** comparing a productio
 
 ---
 
-## 💻 3. Golden Response Reference (`golden_response.py`)
-The `golden_response.py` file represents the ideal reference implementation. It integrates **100% of all coding files** of the project into a single, fully annotated, highly resilient script featuring:
-- **Resilient Model Loaders**: Disabled PyTorch Hub pretraining downloads to ensure the system starts up completely offline or under restricted firewalls.
-- **Audio Fallbacks**: Employs a custom, clean **ADSR sine-wave synthesizer** that takes over automatically if a system-level FluidSynth installation is not found.
-- **Hardware Fallbacks**: Automatically degrades gracefully to single-modality mode if a camera or microphone is missing, and falls back to CPU if no CUDA GPU is present.
+## 💻 3. Golden Response Reference (`golden_response/`)
+The `golden_response/` directory contains the complete implementation:
+- **`golden_response.py`**: Integrates **100% of all coding files** of the project into a single, fully annotated, highly resilient script featuring:
+  - **Resilient Model Loaders**: Disabled PyTorch Hub pretraining downloads to ensure the system starts up completely offline or under restricted firewalls.
+  - **Audio Fallbacks**: Employs a custom, clean **ADSR sine-wave synthesizer** that takes over automatically if a system-level FluidSynth installation is not found.
+  - **Hardware Fallbacks**: Automatically degrades gracefully to single-modality mode if a camera or microphone is missing, and falls back to CPU if no CUDA GPU is present.
+- **`emotion_music/`**: Modular packages of the golden response.
 
 ### ⚙️ Quick Start Instructions
 
@@ -49,6 +52,7 @@ To run the Golden Response codebase:
 
 #### 1. Setup Virtual Environment
 ```bash
+cd golden_response
 python -m venv emotion_music/venv
 emotion_music\venv\Scripts\activate        # On Windows
 source emotion_music/venv/bin/activate     # On Mac/Linux
